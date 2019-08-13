@@ -1,14 +1,14 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
+import ssl
 
 from bs4 import BeautifulSoup
 from urllib.parse import quote
 import string
 import urllib3
 import MovieThread
-import MySql
 
-# urllib3.disable_warnings()
+urllib3.disable_warnings()
 
 user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14) AppleWebKit\
         /537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36'
@@ -27,7 +27,7 @@ class Category:
         headers = {
             'User-Agent': user_agent
         }
-        http = urllib3.PoolManager()
+        http = urllib3.PoolManager(cert_reqs=ssl.CERT_NONE)
         web_data = http.request('GET', url, headers=headers).data
         soup = BeautifulSoup(web_data, 'html.parser', from_encoding='GBK')
         nav = soup.find(class_='nav')

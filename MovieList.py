@@ -1,12 +1,12 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
+import ssl
 
 from bs4 import BeautifulSoup
 from urllib.parse import quote
 import string
 import urllib3
 import MovieDetail
-import MySql
 urllib3.disable_warnings()
 
 
@@ -48,7 +48,7 @@ class MovieList:
             'User-Agent': user_agent
         }
         url = quote(url, safe=string.printable)
-        http = urllib3.PoolManager()
+        http = urllib3.PoolManager(cert_reqs=ssl.CERT_NONE)
         web_data = http.request('GET', url, headers=headers).data
         soup = BeautifulSoup(web_data, 'html.parser', from_encoding='GBK')
         if self.endpages == 0:

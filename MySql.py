@@ -14,7 +14,7 @@ class MySql:
         self.db1 = pymysql.connect(
             host="localhost",
             user="root",
-            passwd="666666",
+            passwd="Whde8751643",
             port=3306,
             db="Movie")
         cursor = self.db1.cursor()

@@ -1,5 +1,7 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
+import ssl
+import time
 
 from bs4 import BeautifulSoup
 from urllib.parse import quote
@@ -7,12 +9,17 @@ import string
 import urllib3
 import pymysql
 import re
-import MySql
+import hashlib
 urllib3.disable_warnings()
 
 user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14) AppleWebKit\
         /537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36'
 
+
+def create_id():
+    m = hashlib.md5(str(time.clock()).encode('utf-8'))
+    return m.hexdigest()
+    
 
 class MovieDetail:
     def __init__(self, mysql, url, movietitle):
@@ -27,7 +34,7 @@ class MovieDetail:
         headers = {
             'User-Agent': user_agent
         }
-        http = urllib3.PoolManager()
+        http = urllib3.PoolManager(cert_reqs=ssl.CERT_NONE)
         web_data = http.request('GET', url, headers=headers).data
         soup = BeautifulSoup(web_data, 'html.parser', from_encoding='GBK')
         try:
@@ -39,8 +46,8 @@ class MovieDetail:
             info = ''
             pass
         mat = re.search(r"(\d{4}-\d{1,2}-\d{1,2})", info)
-        time = mat.group(0)
-        title = info.replace(time, '').replace('发布时间：', '').replace('片名：', '')
+        t = mat.group(0)
+        title = info.replace(t, '').replace('发布时间：', '').replace('片名：', '')
         if len(title) > 0:
             self.movietitle = title
 
@@ -58,7 +65,7 @@ class MovieDetail:
         for down in bots:
             res = down.get('href')
             MovieDetail.insetdb(self, self.movietitle, res)
-        return time, self.movietitle, txt
+        return t, self.movietitle, txt
 
     # noinspection PyMethodMayBeStatic
     def insetdb(self, movietitle, res):
